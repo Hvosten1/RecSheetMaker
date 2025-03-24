@@ -87,7 +87,7 @@ class RecommendationApp(ctk.CTk):
         self.recommendation_text.configure(state="normal")
         self.recommendation_text.delete("1.0", "end")
         self.recommendation_text.insert("1.0", recommendations.get(disease, "Нет данных"))
-        self.recommendation_text.configure(state="disabled")
+        self.recommendation_text.configure(state="disabled")  # Заблокировать ввод
 
     def create_main_tab(self):
         """Вкладка для создания рекомендаций"""
@@ -164,6 +164,34 @@ class RecommendationApp(ctk.CTk):
         # Показываем уведомление
         CTkMessagebox(title="Готово", message=f"Рекомендации сохранены:\n{file_path}", icon="info")
 
+    def enable_editing(self):
+        """Разблокирует поле для редактирования"""
+        self.recommendation_text.configure(state="normal")
+        self.btn_save.configure(state="normal")  # Разблокировать кнопку "Сохранить"
+
+    def save_edited_recommendation(self):
+        """Сохраняет отредактированную рекомендацию"""
+        disease = self.disease_list.get()
+        if not disease:
+            CTkMessagebox(title="Ошибка", message="Выберите болезнь для редактирования!", icon="cancel")
+            return
+
+        new_text = self.recommendation_text.get("1.0", "end").strip()
+        if not new_text:
+            CTkMessagebox(title="Ошибка", message="Рекомендация не может быть пустой!", icon="cancel")
+            return
+
+        recommendations = load_recommendations()
+        recommendations[disease] = new_text
+
+        with open(JSON_FILE, "w", encoding="utf-8") as f:
+            json.dump(recommendations, f, ensure_ascii=False, indent=4)
+
+        self.recommendation_text.configure(state="disabled")
+        self.btn_save.configure(state="disabled")  # Заблокировать кнопку "Сохранить"
+
+        CTkMessagebox(title="Готово", message=f'Рекомендация для "{disease}" обновлена!', icon="check")
+
     def create_directory_tab(self):
         """Вкладка 'Справочник рекомендаций'"""
         tab_directory = self.tabview.add("📚 Справочник рекомендаций")
@@ -173,14 +201,28 @@ class RecommendationApp(ctk.CTk):
 
         ctk.CTkLabel(frame, text="Выберите болезнь:", font=("Montserrat", 16, "bold"), text_color="black").pack(pady=5)
 
-        self.disease_list = ctk.CTkComboBox(frame, width=400, values=[], command=self.display_recommendation)
+        # Комбобокс, заблокированный для ввода
+        self.disease_list = ctk.CTkComboBox(frame, width=400, values=[], command=self.display_recommendation,
+                                            state="readonly")
         self.disease_list.pack(pady=5)
 
         self.recommendation_text = ctk.CTkTextbox(frame, width=400, height=100, corner_radius=12, font=("Inter", 14))
         self.recommendation_text.pack(pady=5)
         self.recommendation_text.configure(state="disabled")
 
-        self.btn_delete = ctk.CTkButton(frame, text="🗑 Удалить болезнь", command=self.confirm_delete_disease, fg_color="red", corner_radius=15, font=("Montserrat", 14))
+        self.btn_edit = ctk.CTkButton(frame, text="✏ Редактировать", command=self.enable_editing, fg_color="blue",
+                                      corner_radius=15, font=("Montserrat", 14))
+        self.btn_edit.pack(pady=5)
+
+        self.btn_save = ctk.CTkButton(frame, text="💾 Сохранить", command=self.save_edited_recommendation,
+                                      fg_color="green",
+                                      corner_radius=15, font=("Montserrat", 14))
+        self.btn_save.pack(pady=5)
+        self.btn_save.configure(state="disabled")  # Заблокируем кнопку "Сохранить" до редактирования
+
+        self.btn_delete = ctk.CTkButton(frame, text="🗑 Удалить болезнь", command=self.confirm_delete_disease,
+                                        fg_color="red", corner_radius=15, font=("Montserrat", 14))
         self.btn_delete.pack(pady=10)
 
         self.refresh_disease_list()
+
