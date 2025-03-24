@@ -38,11 +38,21 @@ class Logic:
 
     @staticmethod
     def add_recommendation(disease, recommendation):
-        """Добавляет болезнь в JSON"""
+        """Добавляет болезнь и её рекомендацию в JSON"""
         recommendations = Logic.load_recommendations()
         recommendations[disease] = recommendation
 
         # Записываем в JSON
+        with open(JSON_FILE, "w", encoding="utf-8") as f:
+            json.dump(recommendations, f, ensure_ascii=False, indent=4)
+
+    @staticmethod
+    def delete_recommendation(disease):
+        """Удаляет болезнь из JSON"""
+        recommendations = Logic.load_recommendations()
+        if disease in recommendations:
+            del recommendations[disease]
+
         with open(JSON_FILE, "w", encoding="utf-8") as f:
             json.dump(recommendations, f, ensure_ascii=False, indent=4)
 
