@@ -2,6 +2,7 @@ import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
 import json
 import os
+from pdf_generator import generate_pdf
 
 JSON_FILE = "recommendations.json"
 
@@ -48,7 +49,7 @@ def refresh_disease_checkboxes(app):
         app.disease_vars[disease] = var
 
 def generate_recommendations(app):
-    """Генерирует рекомендации в файл"""
+    """Генерация файла рекомендаций в PDF"""
     name = app.entry_name.get().strip()
     if not name:
         CTkMessagebox(title="Ошибка", message="Введите имя пациента!", icon="cancel")
@@ -59,5 +60,8 @@ def generate_recommendations(app):
         CTkMessagebox(title="Ошибка", message="Выберите хотя бы одно заболевание!", icon="warning")
         return
 
-    file_path = app.logic.generate_recommendations(name, selected_diseases)
-    CTkMessagebox(title="Готово", message=f"Рекомендации сохранены:\n{file_path}", icon="info")
+    recommendations = load_recommendations()
+    file_path = generate_pdf(name, selected_diseases, recommendations)
+
+    # Показываем уведомление
+    CTkMessagebox(title="Готово", message=f"Рекомендации сохранены в PDF:\n{file_path}", icon="info")
