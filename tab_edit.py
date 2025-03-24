@@ -1,6 +1,22 @@
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
+import json
+import os
 
+JSON_FILE = "recommendations.json"
+
+def load_recommendations():
+    """Загружает рекомендации из JSON-файла"""
+    if not os.path.exists(JSON_FILE):
+        with open(JSON_FILE, "w", encoding="utf-8") as f:
+            json.dump({}, f, ensure_ascii=False, indent=4)
+    with open(JSON_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def refresh_disease_list(app):
+    """Обновляет список болезней в справочнике"""
+    recommendations = load_recommendations()
+    app.disease_list.configure(values=list(recommendations.keys()))
 
 def create_edit_tab(app):
     """Вкладка для добавления новых болезней"""
@@ -21,6 +37,18 @@ def create_edit_tab(app):
                                  font=("Montserrat", 14))
     app.btn_add.pack(pady=10)
 
+def refresh_disease_checkboxes(app):
+    """Обновляет список заболеваний"""
+    recommendations = load_recommendations()
+    for widget in app.disease_frame.winfo_children():
+        widget.destroy()
+
+    for disease in recommendations.keys():
+        var = ctk.BooleanVar()
+        chk = ctk.CTkCheckBox(app.disease_frame, text=disease, variable=var, font=("Inter", 14))
+        chk.pack(anchor="w", padx=10, pady=2)
+        app.disease_vars[disease] = var
+
 
 def add_recommendation(app):
     """Добавляет болезнь и её рекомендацию в JSON"""
@@ -31,8 +59,8 @@ def add_recommendation(app):
         return
 
     app.logic.add_recommendation(disease, recommendation)
-    app.refresh_disease_checkboxes()
-    app.refresh_disease_list()
+    refresh_disease_checkboxes(app)
+    refresh_disease_list(app)
 
     CTkMessagebox(title="Готово", message=f'Рекомендация для "{disease}" добавлена!', icon="check")
 
