@@ -3,6 +3,7 @@ from CTkMessagebox import CTkMessagebox
 import json
 import os
 from pdf_generator import generate_pdf
+from word_generator import generate_word
 
 JSON_FILE = "recommendations.json"
 
@@ -61,7 +62,8 @@ def generate_recommendations(app):
         return
 
     recommendations = load_recommendations()
-    file_path = generate_pdf(name, selected_diseases, recommendations)
+    # file_path = generate_pdf(name, selected_diseases, recommendations)
+    file_path = generate_word(name, selected_diseases, recommendations)
 
     # Показываем уведомление
     CTkMessagebox(title="Готово", message=f"Рекомендации сохранены в PDF:\n{file_path}", icon="info")
