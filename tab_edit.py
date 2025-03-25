@@ -2,6 +2,7 @@ import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
 import json
 import os
+import tab_directory
 
 JSON_FILE = "recommendations.json"
 
@@ -13,10 +14,6 @@ def load_recommendations():
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def refresh_disease_list(app):
-    """Обновляет список болезней в справочнике"""
-    recommendations = load_recommendations()
-    app.disease_list.configure(values=list(recommendations.keys()))
 
 def create_edit_tab(app):
     """Вкладка для добавления новых болезней"""
@@ -60,7 +57,7 @@ def add_recommendation(app):
 
     app.logic.add_recommendation(disease, recommendation)
     refresh_disease_checkboxes(app)
-    refresh_disease_list(app)
+    tab_directory.refresh_disease_list(app)
 
     CTkMessagebox(title="Готово", message=f'Рекомендация для "{disease}" добавлена!', icon="check")
 

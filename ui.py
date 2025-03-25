@@ -20,8 +20,8 @@ class RecommendationApp(ctk.CTk):
     def __init__(self, logic):
         super().__init__()
         self.logic = logic
-        self.title("AI Врач - Современный помощник")
-        self.geometry("800x600")
+        self.title("Помощник формирования списка рекомендаций")
+        self.geometry("1200x800")
 
         # **Светлая тема**
         ctk.set_appearance_mode("light")
