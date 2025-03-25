@@ -13,9 +13,14 @@ def load_recommendations():
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def refresh_disease_list(app):
-    """Обновляет список болезней в справочнике"""
+def refresh_disease_list(app, search_query=""):
+    """Обновляет список болезней в справочнике с учетом поиска"""
     recommendations = load_recommendations()
+    sorted_diseases = sorted(recommendations.keys())  # Сортируем по алфавиту
+
+    # Фильтруем по поисковому запросу
+    if search_query:
+        sorted_diseases = [d for d in sorted_diseases if search_query.lower() in d.lower()]
 
     # Очистка существующих элементов
     for widget in app.disease_list_frame.winfo_children():
@@ -23,16 +28,21 @@ def refresh_disease_list(app):
 
     app.disease_var.set("")  # Сбрасываем выбранную болезнь
 
-    for disease in recommendations.keys():
+    for disease in sorted_diseases:
         radio_btn = ctk.CTkRadioButton(
             app.disease_list_frame,
             text=disease,
             variable=app.disease_var,
             value=disease,
             font=("Inter", 14),
-            command=lambda: display_recommendation(app, app.disease_var.get())
+            command=lambda d=disease: display_recommendation(app, d)
         )
         radio_btn.pack(anchor="w", padx=5, pady=2)
+
+def search_diseases(app):
+    """Функция поиска при изменении текста"""
+    search_query = app.search_entry.get()
+    refresh_disease_list(app, search_query)
 
 def confirm_delete_disease(app):
     """Подтверждение удаления болезни"""
@@ -106,6 +116,11 @@ def create_directory_tab(app):
     frame.pack(pady=20, padx=20, fill="both", expand=True)
 
     ctk.CTkLabel(frame, text="Выберите болезнь:", font=("Montserrat", 16, "bold"), text_color="black").pack(pady=5)
+
+    # Поле поиска
+    app.search_entry = ctk.CTkEntry(frame, width=400, placeholder_text="🔍 Поиск болезни...", font=("Inter", 12))
+    app.search_entry.pack(pady=5)
+    app.search_entry.bind("<KeyRelease>", lambda event: search_diseases(app))  # Обновлять при вводе
 
     # Список болезней с прокруткой
     app.disease_var = ctk.StringVar()
