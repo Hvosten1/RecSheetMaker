@@ -51,7 +51,7 @@ def generate_word(patient_name, diseases, recommendations):
     # Общие рекомендации
     doc.add_paragraph().add_run("Общие рекомендации:").bold = True
     general_paragraph = doc.add_paragraph(general_recommendation)
-    general_paragraph.runs[0].font.size = Pt(11)
+    general_paragraph.runs[0].font.size = Pt(12)
 
     doc.add_paragraph()  # Отступ
 
@@ -64,11 +64,11 @@ def generate_word(patient_name, diseases, recommendations):
         # Заголовок болезни (жирный)
         disease_paragraph = doc.add_paragraph()
         disease_paragraph.add_run(f"{disease}:").bold = True
-        disease_paragraph.runs[0].font.size = Pt(11)
+        disease_paragraph.runs[0].font.size = Pt(12)
 
         # Рекомендация
         rec_paragraph = doc.add_paragraph(recommendation)
-        rec_paragraph.runs[0].font.size = Pt(11)
+        rec_paragraph.runs[0].font.size = Pt(12)
 
         doc.add_paragraph()  # Отступ между рекомендациями
 
