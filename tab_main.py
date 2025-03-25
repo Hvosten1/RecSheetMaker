@@ -38,19 +38,22 @@ def create_main_tab(app):
     app.btn_generate.pack(pady=10)
 
 def refresh_disease_checkboxes(app):
-    """Обновляет список заболеваний"""
+    """Обновляет список заболеваний, сортируя по алфавиту"""
     recommendations = load_recommendations()
+    sorted_diseases = sorted(recommendations.keys())  # Сортировка по алфавиту
+
+    # Очистка списка
     for widget in app.disease_frame.winfo_children():
         widget.destroy()
 
-    for disease in recommendations.keys():
+    for disease in sorted_diseases:
         var = ctk.BooleanVar()
         chk = ctk.CTkCheckBox(app.disease_frame, text=disease, variable=var, font=("Inter", 14))
         chk.pack(anchor="w", padx=10, pady=2)
         app.disease_vars[disease] = var
 
 def generate_recommendations(app):
-    """Генерация файла рекомендаций в PDF"""
+    """Генерация файла рекомендаций в PDF или Word"""
     name = app.entry_name.get().strip()
     if not name:
         CTkMessagebox(title="Ошибка", message="Введите имя пациента!", icon="cancel")
@@ -66,4 +69,4 @@ def generate_recommendations(app):
     file_path = generate_word(name, selected_diseases, recommendations)
 
     # Показываем уведомление
-    CTkMessagebox(title="Готово", message=f"Рекомендации сохранены в PDF:\n{file_path}", icon="info")
+    CTkMessagebox(title="Готово", message=f"Рекомендации сохранены в Word:\n{file_path}", icon="info")
